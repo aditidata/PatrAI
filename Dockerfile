@@ -2,9 +2,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system deps for chromadb
+# System deps for chromadb + sentence-transformers
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential gcc g++ && \
+    build-essential gcc g++ curl && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -12,8 +12,8 @@ RUN pip install --no-cache-dir --prefer-binary -r requirements.txt
 
 COPY . .
 
-# Build frontend and serve static files from FastAPI
-COPY frontend/dist /app/static
+# Copy pre-built frontend if it exists
+RUN if [ -d "static" ]; then echo "Static files found"; else echo "No static dir"; fi
 
 EXPOSE 8000
 
