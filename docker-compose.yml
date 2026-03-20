@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  duckling:
+    image: rasa/duckling
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  backend:
+    build: .
+    ports:
+      - "8001:8000"
+    env_file: .env
+    depends_on:
+      - redis
+      - duckling
+    restart: unless-stopped
+
+  worker:
+    build: .
+    command: celery -A celery_app worker --loglevel=info
+    env_file: .env
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  beat:
+    build: .
+    command: celery -A celery_app beat --loglevel=info
+    env_file: .env
+    depends_on:
+      - redis
+    restart: unless-stopped
