@@ -53,3 +53,4 @@ services:
   - type: redis
     name: patrai-redis
     plan: free
+    ipAllowList: []
