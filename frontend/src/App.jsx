@@ -4,7 +4,7 @@ import {
   CheckCircle, XCircle, Clock, AlertTriangle, Send, ChevronDown, ChevronUp
 } from 'lucide-react'
 
-const API = import.meta.env.VITE_API_URL || '/api'
+const API = import.meta.env.VITE_API_URL ?? ''
 
 const s = {
   app: { minHeight: '100vh', background: '#0f172a', color: '#e2e8f0', fontFamily: 'system-ui, sans-serif' },

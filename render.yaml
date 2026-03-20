@@ -1,0 +1,55 @@
+services:
+  # FastAPI backend
+  - type: web
+    name: patrai-api
+    runtime: python
+    buildCommand: pip install --prefer-binary -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    rootDir: .
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: ASSISTANT_EMAIL
+        sync: false
+      - key: ASSISTANT_EMAIL_PASSWORD
+        sync: false
+      - key: IMAP_SERVER
+        value: imap.gmail.com
+      - key: SMTP_SERVER
+        value: smtp.gmail.com
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: OLLAMA_BASE_URL
+        value: http://localhost:11434
+      - key: DUCKLING_URL
+        value: http://localhost:8000
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: patrai-redis
+          property: connectionString
+
+  # Celery worker
+  - type: worker
+    name: patrai-worker
+    runtime: python
+    buildCommand: pip install --prefer-binary -r requirements.txt
+    startCommand: celery -A celery_app worker --loglevel=info
+    rootDir: .
+    envVars:
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: patrai-redis
+          property: connectionString
+
+  # Redis
+  - type: redis
+    name: patrai-redis
+    plan: free
